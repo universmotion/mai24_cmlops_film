@@ -1,0 +1,14 @@
+fastapi
+fastapi-cli
+httpcore
+httptools
+httpx
+idna
+Jinja2
+psycopg2-binary
+python-dotenv
+sqlalchemy
+uvicorn
+uvloop
+watchfiles
+websockets
