@@ -9,7 +9,7 @@ __pycache__/
 command_help.txt
 **/.env
 **/secret.yaml
-
+**/.*
 
 # Distribution / packaging
 .Python
