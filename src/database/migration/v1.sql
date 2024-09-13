@@ -41,3 +41,27 @@ CREATE TABLE "movie_user_rating" (
   PRIMARY KEY ("userId", "movieId"), 
   FOREIGN KEY ("movieId") REFERENCES "movie" ("movieId") ON DELETE CASCADE
 );
+
+CREATE TABLE "matrix_user_kind" (
+"userId" INTEGER,
+  "(no genres listed)" REAL,
+  "Action" REAL,
+  "Adventure" REAL,
+  "Animation" REAL,
+  "Children" REAL,
+  "Comedy" REAL,
+  "Crime" REAL,
+  "Documentary" REAL,
+  "Drama" REAL,
+  "Fantasy" REAL,
+  "Film-Noir" REAL,
+  "Horror" REAL,
+  "IMAX" REAL,
+  "Musical" REAL,
+  "Mystery" REAL,
+  "Romance" REAL,
+  "Sci-Fi" REAL,
+  "Thriller" REAL,
+  "War" REAL,
+  "Western" REAL
+);
