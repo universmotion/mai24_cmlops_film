@@ -6,6 +6,9 @@ __pycache__/
 *.so
 
 # User ignore
+src/provider/logs
+src/provider/kubernetes/installation/values.yaml
+src/provider/kubernetes/dag_env/sql-conn-secret.yaml
 command_help.txt
 **/.env
 **/secret.yaml
