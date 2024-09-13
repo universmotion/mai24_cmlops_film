@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: order-data-folder
+  labels:
+    type: local
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath: # TODO: Changer pour un format générale
+    path: "/home/romain/Documents/Formation/mai24_cmlops_film/data/raw"

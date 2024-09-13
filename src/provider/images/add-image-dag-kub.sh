@@ -1,0 +1,15 @@
+#!/bin/bash
+
+nui () 
+{
+
+    username=$(docker info | sed '/Username:/!d;s/.* //'); 
+    echo "Prepare to upload image on docker hub. Your username is:\n";
+    echo $username
+    docker build -t $1 .;
+    docker tag $1 $username/$2;
+    docker push $username/$2;
+}
+export -f nui
+
+nui "send-to-database" "send-to-database"

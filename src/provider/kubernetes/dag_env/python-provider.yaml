@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: send-to-database
+spec:
+  template:
+    spec:
+      containers:
+      - name: send-to-database # TODO: changer le nom de la fonction
+        image: leutergmail/send-to-database
+        command: ["python", "main.py"]
+        envFrom:
+        - secretRef:
+            name: sql-conn
+        - configMapRef:
+            name: postgres-config
+        volumeMounts:
+        - name: order-data-folder
+          mountPath: /app/data/to_ingest
+      restartPolicy: Never
+      volumes:
+      - name: order-data-folder
+        hostPath: # TODO: Changer pour un format générale
+          path: "/home/romain/Documents/Formation/mai24_cmlops_film/data/raw"

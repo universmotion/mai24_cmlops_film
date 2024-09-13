@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airflow-local-dags-folder
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+     namespace: airflow
+     name: airflow-local-dags-folder
+  hostPath: # TODO: attention prendre en compte les différentes possiblités
+    path: "/home/romain/Documents/Formation/mai24_cmlops_film/src/provider/dags"
