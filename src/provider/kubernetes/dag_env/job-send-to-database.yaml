@@ -15,10 +15,10 @@ spec:
         - configMapRef:
             name: postgres-config
         volumeMounts:
-        - name: order-data-folder
+        - name: data-folder
           mountPath: /app/data/to_ingest
       restartPolicy: Never
       volumes:
-      - name: order-data-folder
+      - name: data-folder
         hostPath: # TODO: Changer pour un format générale
-          path: "/home/romain/Documents/Formation/mai24_cmlops_film/data/raw"
+          path: "/home/romain/Documents/Formation/mai24_cmlops_film/data"

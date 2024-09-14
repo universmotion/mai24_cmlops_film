@@ -26,14 +26,15 @@ kubectl -n airflow delete all --all
 helm template apache-airflow/airflow -f ./src/provider/kubernetes/installation/values.yaml > ./src/provider/kubernetes/installation/templates.yaml
 kubectl -n airflow apply -f ./src/provider/kubernetes/installation/templates.yaml
 
+## folder data
+kubectl create -f ./src/provider/kubernetes/dag_env/data-folder-pv.yaml
+kubectl create -f ./src/provider/kubernetes/dag_env/data-folder-pvc.yaml
 
-# Import dag
-kubectl create -f ./src/provider/kubernetes/dag_env/python-provider.yaml
-kubectl create -f ./src/provider/kubernetes/dag_env/order-data-folder-pv.yaml
-kubectl create -f ./src/provider/kubernetes/dag_env/order-data-folder-pvc.yaml
-
+## env
 kubectl create -f ./src/provider/kubernetes/dag_env/sql-conn-configmap.yaml
 kubectl create -f ./src/provider/kubernetes/dag_env/sql-conn-secret.yaml
+
+
 # Se connecter à la plateforme
 # kubectl port-forward svc/airflow-webserver --address 0.0.0.0 8080:8080
 # ou

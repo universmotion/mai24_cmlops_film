@@ -58,3 +58,28 @@ class MovieUserRating(Base):
     timestamp = Column(Integer, nullable=True)
 
     movie = relationship("Movie", back_populates="user_ratings")
+
+class MatrixUserKind(Base):
+    __tablename__ = 'matrix_user_kind'
+    
+    userId = Column(Integer, primary_key=True)
+    no_genres_listed = Column("no genres listed", Float)
+    Action = Column(Float)
+    Adventure = Column(Float)
+    Animation = Column(Float)
+    Children = Column(Float)
+    Comedy = Column(Float)
+    Crime = Column(Float)
+    Documentary = Column(Float)
+    Drama = Column(Float)
+    Fantasy = Column(Float)
+    Film_Noir = Column("Film-Noir", Float)
+    Horror = Column(Float)
+    IMAX = Column(Float)
+    Musical = Column(Float)
+    Mystery = Column(Float)
+    Romance = Column(Float)
+    Sci_Fi = Column("Sci-Fi", Float)
+    Thriller = Column(Float)
+    War = Column(Float)
+    Western = Column(Float)

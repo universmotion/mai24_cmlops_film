@@ -13,3 +13,4 @@ nui ()
 export -f nui
 
 nui "send-to-database" "send-to-database"
+nui "extract-feature" "extract-feature"

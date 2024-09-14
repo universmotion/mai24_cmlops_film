@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: order-data-folder
+  name: data-folder
 spec:
   storageClassName: local-path
   accessModes:
