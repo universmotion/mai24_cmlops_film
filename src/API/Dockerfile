@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./requirements.txt ./requirements.txt
 
-COPY ./app/api.py ./api.py
+COPY ./app/ ./
 
 RUN apt-get update && apt-get install -y build-essential \
     pkg-config

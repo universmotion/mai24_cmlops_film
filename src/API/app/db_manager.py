@@ -1,0 +1,28 @@
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+from datamodel import Client
+
+db_user = os.environ["DB_USER"]
+db_password = os.environ["DB_PASSWORD"]
+db_host = os.environ["DATABASE_HOST"]
+db_port = os.environ["DATABASE_PORT"]
+db_database = os.environ["DB_DATABASE"]
+SQLALCHEMY_DATABASE_URL = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    pool_size=20,       
+    max_overflow=10,    
+)
+
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db() -> Session:
+    db = SessionLocal()
+    try:
+        yield db  
+    finally:
+        db.close()  
