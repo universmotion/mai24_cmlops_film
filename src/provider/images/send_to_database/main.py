@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError
 import os
 from pathlib import Path
 import pandas as pd
-from datamodel import Movie, MovieTag, MatrixUserKind
-from datamodel import MovieUserRating, MovieUserTag, Tag 
+from datamodel import Movie, MovieUserRating, MatrixUserKind
 
 if "MAMBA_EXE" in os.environ: ## TODO: remove 
     import dotenv
@@ -27,18 +27,12 @@ if len(docs_paths) == 0:
     print(docs_paths)
     raise FileNotFoundError("Error: No raw data in directory")
 
-# merge two files to movie_docs
-movie_docs = [pd.read_csv(p) for p in docs_paths if p.stem in ["links", "movies"]]
-movies_docs = pd.merge(movie_docs[1], movie_docs[0], on="movieId")
 
 
 docs_links_tables = [
-    [movies_docs, "movie", Movie],
-    ['raw/genome-tags.csv', 'tag', Tag],
-    ['raw/genome-scores.csv',  'movie_tags', MovieTag],
-    ['raw/tags.csv',  'movie_user_tag', MovieUserTag],
-    ['raw/ratings.csv',  'movie_user_rating', MovieUserRating],
-    ["processed/user_matrix.csv", "matrix_user_kind", MatrixUserKind ]
+    ["processed/user_matrix.csv", "users", MatrixUserKind],
+    ["raw/movies.csv", "movies", Movie],
+    ['raw/ratings.csv',  'movies_users_rating', MovieUserRating],
 ]
 
 
@@ -55,12 +49,12 @@ for d in docs_links_tables: # FIXME: Prendre en compte quand il manque un fichie
     df = df.drop_duplicates()
     
     for i in range(0, df.index.shape[0]+1, 10):
-        try:
+        try: # FIXME: Revoir une autre façon pour gerer les bug de primarykey, etc...
             df.iloc[i:(i+10)].to_sql(
                 name=name_table,
                 index=False, con=db_engine, 
                 method="multi", if_exists='append'
             )
-        except ValueError("Error: " + name_table + " indice: " + str(i)) as e:
+        except Exception as e:
             print(e)
-
+            print("Error: " + name_table + " indice: " + str(i))
