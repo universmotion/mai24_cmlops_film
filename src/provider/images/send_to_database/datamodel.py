@@ -1,85 +1,84 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String, Integer, Float, ForeignKey
+from sqlalchemy.orm import relationship, declarative_base
+import uuid
 
 Base = declarative_base()
 
 class Movie(Base):
-    __tablename__ = 'movie'
+    """
+    Classe représentant les films dans la base de données.
 
-    movieId = Column(Integer, primary_key=True)
-    imdbId = Column(Integer, nullable=True)
-    tmdbId = Column(Float, nullable=True)
+    Attributs :
+    - movieId : Identifiant unique du film, auto-incrémenté.
+    - title : Titre du film (peut être nul).
+    - genres : Liste des genres associés au film sous forme de chaîne de caractères (peut être nul).
+    """
+    
+    __tablename__ = 'movies'
+
+    movieId = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=True)
     genres = Column(String, nullable=True)
 
-    tags = relationship("MovieTag", back_populates="movie")
-    user_tags = relationship("MovieUserTag", back_populates="movie")
-    user_ratings = relationship("MovieUserRating", back_populates="movie")
+class User(Base):
+    """
+    Classe représentant les utilisateurs avec des préférences de genres.
 
+    Attributs :
+    - userId : Identifiant unique de l'utilisateur, auto-incrémenté.
+    - count_movies : Nombre de films associés à l'utilisateur.
+    - Divers genres de films avec des scores, chaque genre est représenté par une colonne Float.
+      Les genres incluent Action, Adventure, Animation, Comedy, etc.
+    - no_genres_listed : Colonne représentant les films sans genres listés.
+    """
+    
+    __tablename__ = 'users'
 
-class Tag(Base):
-    __tablename__ = 'tag'
-
-    tagId = Column(Integer, primary_key=True)
-    tag = Column(String, nullable=True)
-
-    movie_tags = relationship("MovieTag", back_populates="tag")
-
-
-class MovieTag(Base):
-    __tablename__ = 'movie_tags'
-
-    movieId = Column(Integer, ForeignKey('movie.movieId', ondelete='CASCADE'), primary_key=True)
-    tagId = Column(Integer, ForeignKey('tag.tagId', ondelete='CASCADE'), primary_key=True)
-    relevance = Column(Float, nullable=True)
-
-    movie = relationship("Movie", back_populates="tags")
-    tag = relationship("Tag", back_populates="movie_tags")
-
-
-class MovieUserTag(Base):
-    __tablename__ = 'movie_user_tag'
-
-    userId = Column(Integer, primary_key=True)
-    movieId = Column(Integer, ForeignKey('movie.movieId', ondelete='CASCADE'), primary_key=True)
-    tag = Column(String, nullable=True)
-    timestamp = Column(Integer, nullable=True)
-
-    movie = relationship("Movie", back_populates="user_tags")
-
+    userId = Column(Integer, primary_key=True, autoincrement=True)
+    count_movies = Column(Integer, default=0)
+    no_genres_listed = Column(Float, name="(no genres listed)", default=0)
+    Action = Column(Float, default=0)
+    Adventure = Column(Float, default=0)
+    Animation = Column(Float, default=0)
+    Children = Column(Float, default=0)
+    Comedy = Column(Float, default=0)
+    Crime = Column(Float, default=0)
+    Documentary = Column(Float, default=0)
+    Drama = Column(Float, default=0)
+    Fantasy = Column(Float, default=0)
+    Film_Noir = Column(Float, name="Film-Noir", default=0)
+    Horror = Column(Float, default=0)
+    IMAX = Column(Float, default=0)
+    Musical = Column(Float, default=0)
+    Mystery = Column(Float, default=0)
+    Romance = Column(Float, default=0)
+    Sci_Fi = Column(Float, name="Sci-Fi", default=0)
+    Thriller = Column(Float, default=0)
+    War = Column(Float, default=0)
+    Western = Column(Float, default=0)
 
 class MovieUserRating(Base):
-    __tablename__ = 'movie_user_rating'
+    """
+    Classe représentant l'association entre les utilisateurs et les films, avec leur note et un timestamp.
 
-    userId = Column(Integer, primary_key=True)
-    movieId = Column(Integer, ForeignKey('movie.movieId', ondelete='CASCADE'), primary_key=True)
+    Attributs :
+    - userId : Clé étrangère vers la table 'users', identifiant l'utilisateur.
+    - movieId : Clé étrangère vers la table 'movies', identifiant le film.
+    - rating : Note attribuée par l'utilisateur au film.
+    - timestamp : Timestamp de la note donnée par l'utilisateur.
+    
+    Relations :
+    - user : Relation vers la classe User, avec un backref 'movie_ratings'.
+    - movie : Relation vers la classe Movie, avec un backref 'user_ratings'.
+    """
+    
+    __tablename__ = 'movies_users_rating'
+
+    userId = Column(Integer, ForeignKey('users.userId', ondelete="CASCADE"), primary_key=True)
+    movieId = Column(Integer, ForeignKey('movies.movieId', ondelete="CASCADE"), primary_key=True)
     rating = Column(Float, nullable=True)
     timestamp = Column(Integer, nullable=True)
 
-    movie = relationship("Movie", back_populates="user_ratings")
-
-class MatrixUserKind(Base):
-    __tablename__ = 'matrix_user_kind'
-    
-    userId = Column(Integer, primary_key=True)
-    no_genres_listed = Column("no genres listed", Float)
-    Action = Column(Float)
-    Adventure = Column(Float)
-    Animation = Column(Float)
-    Children = Column(Float)
-    Comedy = Column(Float)
-    Crime = Column(Float)
-    Documentary = Column(Float)
-    Drama = Column(Float)
-    Fantasy = Column(Float)
-    Film_Noir = Column("Film-Noir", Float)
-    Horror = Column(Float)
-    IMAX = Column(Float)
-    Musical = Column(Float)
-    Mystery = Column(Float)
-    Romance = Column(Float)
-    Sci_Fi = Column("Sci-Fi", Float)
-    Thriller = Column(Float)
-    War = Column(Float)
-    Western = Column(Float)
+    user = relationship("User", backref="movie_ratings")
+    movie = relationship("Movie", backref="user_ratings")
