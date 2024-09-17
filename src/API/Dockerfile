@@ -2,6 +2,8 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+RUN rm -rf ./app/test
+
 COPY ./requirements.txt ./requirements.txt
 
 COPY ./app/ ./
