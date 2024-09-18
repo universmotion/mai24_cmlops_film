@@ -10,7 +10,7 @@ CREATE TABLE "movies" (
 CREATE TABLE "users" (
   "userId" SERIAL PRIMARY KEY,  
   "count_movies" INTEGER DEFAULT 0,
-  "(no genres listed)" REAL DEFAULT 0,
+  "no_genres_listed" REAL DEFAULT 0,
   "Action" REAL DEFAULT 0,
   "Adventure" REAL DEFAULT 0,
   "Animation" REAL DEFAULT 0,
@@ -20,13 +20,13 @@ CREATE TABLE "users" (
   "Documentary" REAL DEFAULT 0,
   "Drama" REAL DEFAULT 0,
   "Fantasy" REAL DEFAULT 0,
-  "Film-Noir" REAL DEFAULT 0,
+  "Film_Noir" REAL DEFAULT 0,
   "Horror" REAL DEFAULT 0,
   "IMAX" REAL DEFAULT 0,
   "Musical" REAL DEFAULT 0,
   "Mystery" REAL DEFAULT 0,
   "Romance" REAL DEFAULT 0,
-  "Sci-Fi" REAL DEFAULT 0,
+  "Sci_Fi" REAL DEFAULT 0,
   "Thriller" REAL DEFAULT 0,
   "War" REAL DEFAULT 0,
   "Western" REAL DEFAULT 0
@@ -43,9 +43,9 @@ CREATE TABLE "movies_users_rating" (
 );
 
 CREATE TABLE clients (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
-    username VARCHAR(255) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    hashed_password VARCHAR(255) NOT NULL
+    "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
+    "username" VARCHAR(255) UNIQUE NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+    "email" VARCHAR(255) UNIQUE NOT NULL,
+    "hashed_password" VARCHAR(255) NOT NULL
 );

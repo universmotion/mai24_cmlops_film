@@ -44,6 +44,11 @@ def read_movies(movies_csv, data_dir="data/raw") -> pd.DataFrame:
         Un DataFrame contenant les informations sur les films. Les colonnes sont binaires et représentent les genres des films.
     """
     df = pd.read_csv(os.path.join(data_dir, movies_csv))
+    df.genres = df.genres\
+        .str.replace("(", "", regex=False)\
+        .str.replace(")", "", regex=False)\
+        .str.replace("-", "_", regex=False)\
+        .str.replace(" ", "_", regex=False)
 
     genres = df["genres"].str.get_dummies(sep="|")
 
