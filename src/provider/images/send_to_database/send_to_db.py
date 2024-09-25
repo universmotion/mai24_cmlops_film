@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import traceback
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from typing import Union
 import os
 
@@ -65,6 +65,14 @@ class DataSender:
         if isinstance(path_or_df, (str, Path)):
             try:
                 df = pd.read_csv(os.path.join(self.dir_path, path_or_df))
+                df = df.rename(columns={
+                    c: c.replace(" ", "_")\
+                        .replace("(", "")\
+                        .replace(")", "")\
+                        .replace("-", "_") 
+                for c in df.columns
+                }
+            )
             except FileNotFoundError as e:
                 raise ValueError(f"Fichier non trouvé : {e}")
             except pd.errors.EmptyDataError:
@@ -99,8 +107,16 @@ class DataSender:
             self.db.add(new_obj)
             self.db.commit()
             
+        except IntegrityError as e:
+            if "unique constraint" in str(e.orig):
+                print("Erreur unicité :", str(values))
+            elif "foreign key constraint" in str(e.orig):
+                print("Erreur clé étrangère :", str(values))
+            else:
+                print(f"Erreur d'intégrité : {str(e.orig)}")
+        
         except SQLAlchemyError as e:
-            print(f"Erreur SQLAlchemy : {e}")
+            print("Erreur SQLAlchemy:", traceback.format_exc(limit=100))
             is_insert = False
         
         except Exception as e:

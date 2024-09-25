@@ -1,11 +1,9 @@
 from sqlalchemy import create_engine
-from sqlalchemy.exc import IntegrityError
 import os
 from pathlib import Path
-import pandas as pd
 from datamodel import Movie, MovieUserRating, User
-from sqlalchemy.orm import sessionmaker
 from send_to_db import DataSender
+from sqlalchemy.orm import sessionmaker
 
 if "MAMBA_EXE" in os.environ: ## TODO: remove 
     import dotenv
@@ -37,7 +35,7 @@ def main():
         {
             'path_or_df': 'processed/user_matrix.csv', 
             'table_name': 'users', 
-            'schema': User ## FIXME: Attention le (no kind listed) produit une erreur à prendre en compte
+            'schema': User
         }, 
         {
             'path_or_df': 'raw/movies.csv',

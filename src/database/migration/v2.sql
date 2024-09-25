@@ -37,6 +37,8 @@ CREATE TABLE "movies_users_rating" (
   "movieId" INTEGER,  
   "rating" REAL  NULL,
   "timestamp" INTEGER NULL,
+  "is_recommended" BOOLEAN DEFAULT FALSE,
+  "is_use_to_train" BOOLEAN DEFAULT FALSE,
   PRIMARY KEY ("userId", "movieId"), 
   FOREIGN KEY ("movieId") REFERENCES "movies" ("movieId") ON DELETE cascade,
   FOREIGN KEY ("userId") REFERENCES "users" ("userId") ON DELETE CASCADE

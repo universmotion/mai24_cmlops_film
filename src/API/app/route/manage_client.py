@@ -37,7 +37,7 @@ class ClientCreate(BaseModel):
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-@router_client.post("/create-client", tags=["client"])
+@router_client.post("/create-client", tags=["Client"])
 async def create_client(
     client: ClientCreate, db: Session = Depends(get_db)
 ):
@@ -48,8 +48,7 @@ async def create_client(
     Si tout est correct, elle ajoute le nouveau client avec un mot de passe haché.
 
     Arguments :
-    - client : Un objet `ClientCreate` contenant les informations du client.
-    - db : Session de la base de données (injectée via la dépendance).
+    - client : Un objet qui contient les informations du client.
 
     Exceptions :
     - HTTP 400 : Si le nom d'utilisateur ou l'email existent déjà.
@@ -86,7 +85,7 @@ async def create_client(
     return {"message": "Client created successfully", "client_id": new_client.id}
 
 
-@router_client.post("/token", response_model=Token, tags=["client"])
+@router_client.post("/token", response_model=Token, tags=["Client"])
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
@@ -95,10 +94,6 @@ async def login_for_access_token(
 
     Cette route permet à un utilisateur de s'authentifier en envoyant un nom d'utilisateur et un mot de passe.
     Si l'authentification est réussie, elle renvoie un jeton d'accès JWT valide pour une durée déterminée.
-
-    Arguments :
-    - form_data : Formulaire de requête OAuth2 avec le nom d'utilisateur et le mot de passe.
-    - db : Session de la base de données (injectée via la dépendance).
 
     Exceptions :
     - HTTP 400 : Si le nom d'utilisateur ou le mot de passe sont incorrects.

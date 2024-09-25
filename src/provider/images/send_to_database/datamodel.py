@@ -1,5 +1,5 @@
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, Integer, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Integer, Float, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 import uuid
 
@@ -37,7 +37,7 @@ class User(Base):
 
     userId = Column(Integer, primary_key=True, autoincrement=True)
     count_movies = Column(Integer, default=0)
-    no_genres_listed = Column(Float, name="no_genres_listed", default=0)
+    no_genres_listed = Column(Float, default=0)
     Action = Column(Float, default=0)
     Adventure = Column(Float, default=0)
     Animation = Column(Float, default=0)
@@ -47,13 +47,13 @@ class User(Base):
     Documentary = Column(Float, default=0)
     Drama = Column(Float, default=0)
     Fantasy = Column(Float, default=0)
-    Film_Noir = Column(Float, name="Film_Noir", default=0)
+    Film_Noir = Column(Float, default=0)
     Horror = Column(Float, default=0)
     IMAX = Column(Float, default=0)
     Musical = Column(Float, default=0)
     Mystery = Column(Float, default=0)
     Romance = Column(Float, default=0)
-    Sci_Fi = Column(Float, name="Sci_Fi", default=0)
+    Sci_Fi = Column(Float, default=0)
     Thriller = Column(Float, default=0)
     War = Column(Float, default=0)
     Western = Column(Float, default=0)
@@ -79,6 +79,8 @@ class MovieUserRating(Base):
     movieId = Column(Integer, ForeignKey('movies.movieId', ondelete="CASCADE"), primary_key=True)
     rating = Column(Float, nullable=True)
     timestamp = Column(Integer, nullable=True)
+    is_recommended = Column(Boolean, default=False)
+    is_use_to_train = Column(Boolean, default=False)
 
     user = relationship("User", backref="movie_ratings")
     movie = relationship("Movie", backref="user_ratings")
