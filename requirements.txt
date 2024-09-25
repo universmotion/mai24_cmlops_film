@@ -18,3 +18,4 @@ SQLAlchemy==2.0.34
 mlflow==2.16.1
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.9
+prometheus-fastapi-instrumentator
