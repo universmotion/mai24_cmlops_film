@@ -9,7 +9,7 @@ def test_app_initialization():
     response = client.get("/openapi.json")
     assert response.status_code == 200
     assert response.json()["info"]["title"] == "Movies Recommendation System API"
-    assert response.json()["info"]["version"] == "0.3.0"
+    assert response.json()["info"]["version"] == "0.4.0"
 
 def test_routes_included():
     client = TestClient(app)
