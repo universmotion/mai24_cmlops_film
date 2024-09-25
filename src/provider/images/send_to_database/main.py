@@ -32,19 +32,20 @@ def main():
         raise FileNotFoundError("Error: No raw data in directory")
 
     docs_links_tables = [
-        {
-            'path_or_df': 'processed/user_matrix.csv', 
-            'table_name': 'users', 
-            'schema': User
-        }, 
-        {
-            'path_or_df': 'raw/movies.csv',
-            'table_name': 'movies', 
-            'schema': Movie
-        }, 
+        # {
+        #     'path_or_df': 'processed/user_matrix.csv', 
+        #     'table_name': 'users', 
+        #     'schema': User
+        # }, 
+        # {
+        #     'path_or_df': 'raw/movies.csv',
+        #     'table_name': 'movies', 
+        #     'schema': Movie
+        # }, 
         {
             'path_or_df': 'raw/ratings.csv', 
             'table_name': 'movies_users_rating', 
+            "change_col_type":{"timestamp":"timestamp"},
             'schema': MovieUserRating
         }
     ]

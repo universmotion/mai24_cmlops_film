@@ -1,5 +1,7 @@
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, Integer, Float, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Integer,\
+    Float, ForeignKey, Boolean, TIMESTAMP
+from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
 import uuid
 
@@ -78,7 +80,7 @@ class MovieUserRating(Base):
     userId = Column(Integer, ForeignKey('users.userId', ondelete="CASCADE"), primary_key=True)
     movieId = Column(Integer, ForeignKey('movies.movieId', ondelete="CASCADE"), primary_key=True)
     rating = Column(Float, nullable=True)
-    timestamp = Column(Integer, nullable=True)
+    timestamp = Column(TIMESTAMP, server_default=func.now())
     is_recommended = Column(Boolean, default=False)
     is_use_to_train = Column(Boolean, default=False)
 

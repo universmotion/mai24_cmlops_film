@@ -154,7 +154,7 @@ def add_movies_to_user(db: Session, user_id: int, movies: List[MovieSchema]) -> 
                 userId=user_id,
                 movieId=movie_id,
                 rating=rating,
-                timestamp=int(datetime.now().timestamp())
+                timestamp=pd.Timestamp.now().round(freq='s')
             )
             db.add(new_rating)
             db.commit()
@@ -167,7 +167,7 @@ def add_movies_to_user(db: Session, user_id: int, movies: List[MovieSchema]) -> 
                     "userId":user_id,
                     "movieId":movie_id,
                     "rating":rating,
-                    "timestamp":int(datetime.now().timestamp())
+                    "timestamp":pd.Timestamp.now().round(freq='s')
                 })
             elif "foreign key constraint" in str(e.orig):
                 print(f"Erreur de clé étrangère : le film {movie_id} ou l'utilisateur {user_id} n'existe pas.")
@@ -270,7 +270,7 @@ def save_recommandation(db: Session, output: Dict) -> bool:
             userId=output["userId"],
             movieId=output["recommendation"]["movieId"],
             rating=None,
-            timestamp=int(datetime.now().timestamp()),
+            timestamp=pd.Timestamp.now().round(freq='s'),
             is_recommended=True
         )
         db.add(new_rating)

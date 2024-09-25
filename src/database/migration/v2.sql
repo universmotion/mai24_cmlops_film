@@ -36,7 +36,7 @@ CREATE TABLE "movies_users_rating" (
   "userId" INTEGER,
   "movieId" INTEGER,  
   "rating" REAL  NULL,
-  "timestamp" INTEGER NULL,
+  "timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   "is_recommended" BOOLEAN DEFAULT FALSE,
   "is_use_to_train" BOOLEAN DEFAULT FALSE,
   PRIMARY KEY ("userId", "movieId"), 
