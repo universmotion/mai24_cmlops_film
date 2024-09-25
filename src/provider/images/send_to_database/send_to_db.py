@@ -108,18 +108,22 @@ class DataSender:
             self.db.commit()
             
         except IntegrityError as e:
+            self.db.rollback()
             if "unique constraint" in str(e.orig):
                 print("Erreur unicité :", str(values))
             elif "foreign key constraint" in str(e.orig):
                 print("Erreur clé étrangère :", str(values))
             else:
                 print(f"Erreur d'intégrité : {str(e.orig)}")
+            is_insert = False
         
         except SQLAlchemyError as e:
+            self.db.rollback()
             print("Erreur SQLAlchemy:", traceback.format_exc(limit=100))
             is_insert = False
         
         except Exception as e:
+            self.db.rollback()
             print(f"Erreur inattendue lors de l'insertion des données : {e}")
             traceback.print_exc()
             is_insert = False
@@ -140,6 +144,13 @@ class DataSender:
             df.to_csv(os.path.join(bad_data_path, name_df + ".csv"), index=False)
         except Exception as e:
             print(f"Erreur lors de la sauvegarde des données erronées : {e}")
+
+    def change_type_col(df, col_types: dict):
+        
+        for col, type_col in col_types.items():
+            if type_col == "timestamp":
+                df[col] = pd.to_datetime(df[col], unit="s")
+        return df
     
     def __call__(self) -> None:
         """
@@ -151,7 +162,10 @@ class DataSender:
         for doc in self.docs_links_tables:
             try:
                 list_bad_iter = []
+                print("## Start to injected table:", doc["path_or_df"])
                 df = self.get_df(doc)
+                if "change_col_type" in list(doc.keys()):
+                    df = DataSender.change_type_col(df, doc["change_col_type"])
                 list_dict = df.to_dict(orient="records")
                 for iter, row in enumerate(list_dict):
                     is_commit = self.send_df_to_database(row, doc["schema"])
@@ -160,6 +174,7 @@ class DataSender:
                 
                 if list_bad_iter:
                     self.keep_bad_data_df(df.iloc[list_bad_iter], doc["schema"].__tablename__)
+                print("## Finished to injected") 
 
             except ValueError as ve:
                 print(f"Erreur dans le fichier {doc['path_or_df']} : {ve}")
