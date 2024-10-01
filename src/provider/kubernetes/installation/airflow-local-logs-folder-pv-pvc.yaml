@@ -13,3 +13,15 @@ spec:
      name: airflow-local-logs-folder
   hostPath: # TODO: attention prendre en compte les différentes possiblités
     path: "/home/romain/Documents/Formation/mai24_cmlops_film/src/provider/logs"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-local-logs-folder
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

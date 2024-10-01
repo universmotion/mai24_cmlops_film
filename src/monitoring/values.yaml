@@ -1116,7 +1116,18 @@ grafana:
 
   ## Configure additional grafana datasources (passed through tpl)
   ## ref: http://docs.grafana.org/administration/provisioning/#datasources
-  additionalDataSources: []
+  additionalDataSources: # INFO: Ici qu'il faut modifier
+  - name: Recommandation-database
+    type: postgres
+    access: proxy
+    url: "10.43.150.34:5432"
+    database: "postgresdb"
+    user: "admin"
+    secureJsonData:
+      password: "admin"
+    jsonData:
+      sslmode: "disable"  # Ou "require" si vous utilisez SSL
+      postgresVersion: 1300
   # - name: prometheus-sample
   #   access: proxy
   #   basicAuth: true
@@ -3600,7 +3611,6 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the PrometheusRule resources created
     ##
-    ruleSelectorNilUsesHelmValues: true
 
     ## PrometheusRules to be selected for target discovery.
     ## If {}, select all PrometheusRules
@@ -3648,7 +3658,6 @@ prometheus:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the podmonitors created
     ##
-    podMonitorSelectorNilUsesHelmValues: true
 
     ## PodMonitors to be selected for target discovery.
     ## If {}, select all PodMonitors
@@ -4513,7 +4522,6 @@ thanosRuler:
     ## prometheus resource to be created with selectors based on values in the helm deployment,
     ## which will also match the PrometheusRule resources created
     ##
-    ruleSelectorNilUsesHelmValues: true
 
     ## PrometheusRules to be selected for target discovery.
     ## If {}, select all PrometheusRules

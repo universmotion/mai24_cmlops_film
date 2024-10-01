@@ -7,6 +7,9 @@ __pycache__/
 
 # User ignore
 src/provider/logs
+src/database/backup_db
+src/simulator
+models
 src/provider/kubernetes/installation/values.yaml
 src/provider/kubernetes/dag_env/sql-conn-secret.yaml
 command_help.txt

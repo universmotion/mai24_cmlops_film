@@ -15,4 +15,6 @@ RUN pip install --upgrade pip
 
 RUN pip install -r requirements.txt
 
+RUN mkdir -p /app/data/models
+
 RUN rm requirements.txt

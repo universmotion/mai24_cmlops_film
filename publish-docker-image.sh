@@ -9,6 +9,8 @@ nui ()
     echo "$username/$1";
 }
 
-nui "send-to-database" src/provider/images/send_to_database ;
-nui "extract-feature" src/provider/images/extract_feature ;
+# nui "train-model" src/provider/images/train_model ;
+# nui "send-to-database" src/provider/images/send_to_database ;
+# nui "extract-feature" src/provider/images/extract_feature ;
+# nui "scraping-data" src/provider/images/scraping_data ;
 nui "api-sys-reco-projet-ds" src/API ;

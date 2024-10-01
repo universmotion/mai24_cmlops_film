@@ -28,3 +28,10 @@ spec:
               name: fastapi-secret
           - configMapRef:
               name: postgres-config
+        volumeMounts:
+          - mountPath: /app/data/models
+            name: models-folder-pv
+      volumes:
+        - name: models-folder-pv
+          persistentVolumeClaim:
+            claimName: models-folder-pvc

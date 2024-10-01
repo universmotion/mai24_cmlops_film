@@ -20,7 +20,7 @@ bash ./src/provider/setup-airflow.sh
 bash ./src/monitoring/setup-monitoring.sh
 
 ## Stop
-# kubectl -n sys-reco-dev delete all --all
+# kubectl -n database delete all --all
 # kubectl -n api delete all --all
 # helm uninstall airflow -n airflow 
 # helm uninstall prometheus -n monitoring 

@@ -7,12 +7,9 @@ helm repo add apache-airflow https://airflow.apache.org
 sudo kubectl config set-context --current --namespace=airflow
 
 ## Log / dag / data folder 
-kubectl create -f ./src/provider/kubernetes/installation/airflow-local-dags-folder-pv.yaml
-kubectl create -f ./src/provider/kubernetes/installation/airflow-local-dags-folder-pvc.yaml
-kubectl create -f ./src/provider/kubernetes/installation/airflow-local-logs-folder-pv.yaml
-kubectl create -f ./src/provider/kubernetes/installation/airflow-local-logs-folder-pvc.yaml
-kubectl create -f ./src/provider/kubernetes/dag_env/data-folder-pv.yaml
-kubectl create -f ./src/provider/kubernetes/dag_env/data-folder-pvc.yaml
+kubectl create -f ./src/provider/kubernetes/installation/airflow-local-dags-folder-pv-pvc.yaml
+kubectl create -f ./src/provider/kubernetes/installation/airflow-local-logs-folder-pv-pvc.yaml
+kubectl create -f ./src/provider/kubernetes/dag_env/data-folder-pv-pvc.yaml
 
 ## Env for DAG
 kubectl create -f ./src/provider/kubernetes/dag_env/sql-conn-configmap.yaml

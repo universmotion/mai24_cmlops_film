@@ -1,5 +1,5 @@
-kubectl create namespace sys-reco-dev
-sudo kubectl config set-context --current --namespace=sys-reco-dev
+kubectl create namespace database
+sudo kubectl config set-context --current --namespace=database
 
 kubectl apply -f ./src/database/DB/pv-pvc-postgres.yaml
 kubectl apply -f ./src/database/DB/service.yaml

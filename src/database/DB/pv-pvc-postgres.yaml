@@ -12,7 +12,7 @@ spec:
   accessModes:
     - ReadWriteMany
   claimRef:
-     namespace: sys-reco-dev
+     namespace: database
      name: postgres-pvc
   hostPath:
     path: /mnt/data/postgres
