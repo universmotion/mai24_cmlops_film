@@ -10,6 +10,7 @@ sudo kubectl config set-context --current --namespace=airflow
 kubectl create -f ./src/provider/kubernetes/installation/airflow-local-dags-folder-pv-pvc.yaml
 kubectl create -f ./src/provider/kubernetes/installation/airflow-local-logs-folder-pv-pvc.yaml
 kubectl create -f ./src/provider/kubernetes/dag_env/data-folder-pv-pvc.yaml
+kubectl create -f ./src/provider/kubernetes/dag_env/model-folder-pv-pvc.yaml
 
 ## Env for DAG
 kubectl create -f ./src/provider/kubernetes/dag_env/sql-conn-configmap.yaml
@@ -20,4 +21,4 @@ helm install airflow -n airflow
 helm upgrade --install airflow apache-airflow/airflow -f ./src/provider/kubernetes/installation/values.yaml -n airflow
 
 # Se connecter à la plateforme
-# kubectl port-forward svc/airflow-webserver --address 0.0.0.0 8080:8080
+# kubectl port-forward svc/airflow-webserver -n airflow --address 0.0.0.0 8080:8080

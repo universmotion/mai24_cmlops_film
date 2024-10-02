@@ -1,28 +1,31 @@
 
 import os
 from pathlib import Path
-import pandas as pd
 from datetime import datetime
 import shutil
 
 
-if os.environ["HOME"] == "/home/romain":
+if "MAMBA_EXE" in os.environ:
     data_path = Path("data")
+    date = datetime.now()
 else:
-    data_path = Path("/app/data/to_ingest")
+    date = datetime.strptime(os.environ["DATE_FOLDER"], '%Y-%m-%d')
+    data_path = Path("/app/data/to_ingest/")
     
 
 def main():
-    date = datetime.now()
+    
     print("## Debut de tache")
     try:
         simulation_data_path = os.path.join(data_path, date.strftime("simulation_data/%Y/%m/%d"))
+
         raw_data_path = os.path.join(data_path,  date.strftime("raw/%Y/%m/%d"))
+        
         os.makedirs(raw_data_path, exist_ok=True)
 
         list_files_to_copy = list(Path(simulation_data_path).glob("*.csv"))
-        print("## Listes des fichiers disponibles:")
 
+        print("## Listes des fichiers disponibles:")
         for file in list_files_to_copy:
             filename = file.name
             print("- ", filename)

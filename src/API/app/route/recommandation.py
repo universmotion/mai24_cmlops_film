@@ -12,10 +12,23 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from dependancies import get_current_user
 from datamodel import Movie, MovieUserRating, User
+import pickle
+import os
+from pathlib import Path 
+import numpy as np
+
+if "MAMBA_EXE" in os.environ:
+    model_path = Path("/home/romain/Documents/Formation/mai24_cmlops_film/models")
+else:  
+    model_path = Path("/app/data/models")
+
+path_model = list(model_path.glob("*.pkl"))[0]
+with open(path_model, mode="rb") as f:
+    MODEL = pickle.load(f)
 
 reco_router = APIRouter()
 
-## Monitoring
+## 
 class MovieSchema(BaseModel):
     """
     Schéma représentant un film et la note associée (facultative).
@@ -222,13 +235,14 @@ def set_new_features(db: Session, user_id: int) -> None:
         raise HTTPException(status_code=500, detail="Error setting new features to user")
 
 
-def recommend_movie(db: Session, seen_movies: List[int]) -> Dict:
+def recommend_movie(db: Session, seen_movies: List[int], user_id:int) -> Dict:
     """
     Recommande un nouveau film à un utilisateur en évitant les films déjà vus.
 
     Arguments :
     - db : Session de la base de données.
     - seen_movies : Liste d'identifiants de films déjà vus.
+    - user_id : L'id de l'utilisateur.
 
     Exceptions :
     - HTTP 404 : Si aucun nouveau film n'est disponible pour recommandation.
@@ -238,8 +252,22 @@ def recommend_movie(db: Session, seen_movies: List[int]) -> Dict:
     - Un dictionnaire contenant l'identifiant et le titre du film recommandé.
     """
     try:
-        movie = db.query(Movie.movieId, Movie.title)\
+        
+        users = pd.read_sql(
+            db.query(User).filter(User.userId == user_id).statement, 
+            db.bind
+        ).drop(["userId", "count_movies"], axis=1)
+
+        _, indices = MODEL.kneighbors(users)
+        movies_reco_vec = pd.DataFrame(indices, columns=users.columns)
+        genre_to_reco = movies_reco_vec.loc[0]\
+            .sort_values(ascending=False)[:3].sample()\
+            .index.to_list()[:1]
+        regex_reco = "|".join(genre_to_reco) + "%"
+
+        movie = db.query(Movie)\
             .filter(~Movie.movieId.in_(seen_movies))\
+            .filter(Movie.genres.like(regex_reco))\
             .first()
         if movie:
             return {"movieId": movie.movieId, "title": movie.title}
@@ -325,7 +353,7 @@ async def post_recommendation(
             raise HTTPException(status_code=400, detail="Missing movie history (Movie ids provided doesn't exist)")
         seen_movies = get_user_history(connection, user_id)
         
-        recommendation = recommend_movie(connection, seen_movies)
+        recommendation = recommend_movie(connection, seen_movies, user_id)
         output = {"userId": user_id, "recommendation": recommendation}
         save_recommandation(connection, output)
         return output 

@@ -13,4 +13,8 @@ nui ()
 # nui "send-to-database" src/provider/images/send_to_database ;
 # nui "extract-feature" src/provider/images/extract_feature ;
 # nui "scraping-data" src/provider/images/scraping_data ;
-nui "api-sys-reco-projet-ds" src/API ;
+# nui "api-sys-reco-projet-ds" src/API ;
+
+# helm uninstall airflow -n airflow ;
+# bash ./src/provider/setup-airflow.sh ;
+# kubectl port-forward svc/airflow-webserver -n airflow --address 0.0.0.0 8080:8080

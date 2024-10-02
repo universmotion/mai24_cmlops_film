@@ -26,6 +26,9 @@ volume_mount = k8s.V1VolumeMount(
   mount_path="/app/data/to_ingest"
 )
 
+env_dict = {"DATE_FOLDER": "{{ logical_date | ds }}"}
+
+
 with DAG(
   dag_id='injest-data',
   tags=['ETL', 'System Recommandation'],
@@ -37,6 +40,17 @@ with DAG(
   # catchup=False
 ) as dag:
     
+  scraping_data = KubernetesPodOperator(
+      namespace="airflow",
+      task_id="scraping-data",
+      image="leutergmail/scraping-data",
+      cmds=["python3", "main.py"],
+      volumes=[volume],
+      volume_mounts=[volume_mount],
+      on_finish_action="delete_pod",
+      env_vars=env_dict
+  )
+
   extract_features = KubernetesPodOperator(
       namespace="airflow",
       task_id="extract-feature",
@@ -44,7 +58,8 @@ with DAG(
       cmds=["python3", "main.py"],
       on_finish_action="delete_pod",
       volumes=[volume],
-      volume_mounts=[volume_mount]
+      volume_mounts=[volume_mount], 
+      env_vars=env_dict
   )
 
   send_to_database = KubernetesPodOperator(
@@ -57,6 +72,7 @@ with DAG(
       volume_mounts=[volume_mount],
       env_from=configmaps,
       on_finish_action="delete_pod",
+      env_vars=env_dict
   )
-
+scraping_data >> extract_features
 extract_features >> send_to_database 

@@ -115,7 +115,7 @@ class DataSender:
                 print("Erreur clé étrangère :", str(values))
             else:
                 print(f"Erreur d'intégrité : {str(e.orig)}")
-            is_insert = False
+                is_insert = False
         
         except SQLAlchemyError as e:
             self.db.rollback()
@@ -146,7 +146,9 @@ class DataSender:
             print(f"Erreur lors de la sauvegarde des données erronées : {e}")
 
     def change_type_col(df, col_types: dict):
-        
+        """
+        Change le typage des colonne en fonction du dict col_types dans un DataFrame pandas.
+        """
         for col, type_col in col_types.items():
             if type_col == "timestamp":
                 df[col] = pd.to_datetime(df[col], unit="s")
