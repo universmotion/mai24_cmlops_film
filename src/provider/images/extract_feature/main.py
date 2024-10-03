@@ -7,16 +7,15 @@ from build_features import create_user_matrix, read_movies, read_ratings
 from datetime import datetime
 
 
-if "MAMBA_EXE" in os.environ:
-    date = datetime.now()
-    data_path = Path("data")
-else:
-    date = datetime.strptime(os.environ["DATE_FOLDER"], '%Y-%m-%d')
-    data_path = Path("/app/data/to_ingest")
-    
-
 def main():
     try:
+        if "MAMBA_EXE" in os.environ:
+            date = datetime.now()
+            data_path = Path("data")
+        else:
+            date = datetime.strptime(os.environ["DATE_FOLDER"], '%Y-%m-%d')
+            data_path = Path("/app/data/to_ingest")
+    
         print("## Begin task !")
         date = date.strftime("%Y/%m/%d")
         data_raw = os.path.join(data_path, "raw", date)
