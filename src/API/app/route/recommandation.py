@@ -16,6 +16,8 @@ import pickle
 import os
 from pathlib import Path 
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
+
 
 if "MAMBA_EXE" in os.environ:
     model_path = Path("/home/romain/Documents/Formation/mai24_cmlops_film/models")
@@ -257,8 +259,7 @@ def recommend_movie(db: Session, seen_movies: List[int], user_id:int) -> Dict:
             db.query(User).filter(User.userId == user_id).statement, 
             db.bind
         ).drop(["userId", "count_movies"], axis=1)
-
-        _, indices = MODEL.kneighbors(users)
+        _, indices = MODEL.kneighbors(users[MODEL.feature_names_in_])
         movies_reco_vec = pd.DataFrame(indices, columns=users.columns)
         genre_to_reco = movies_reco_vec.loc[0]\
             .sort_values(ascending=False)[:3].sample()\
