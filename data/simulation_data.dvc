@@ -1,0 +1,6 @@
+outs:
+- md5: 741cf86d335534196130931438e875c1.dir
+  size: 586173700
+  nfiles: 80
+  hash: md5
+  path: simulation_data
