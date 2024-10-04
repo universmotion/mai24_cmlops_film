@@ -1,0 +1,6 @@
+outs:
+- md5: b44482dd89efd4d0eddf4c11dba1e1dd.dir
+  size: 398207636
+  nfiles: 1
+  hash: md5
+  path: backup_db

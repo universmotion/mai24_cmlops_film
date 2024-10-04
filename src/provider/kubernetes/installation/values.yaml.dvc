@@ -1,0 +1,5 @@
+outs:
+- md5: 8b2988bc533e6c48cb869b3fd274af5e
+  size: 83134
+  hash: md5
+  path: values.yaml
