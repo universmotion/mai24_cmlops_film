@@ -7,6 +7,7 @@ __pycache__/
 
 # User ignore
 src/provider/logs
+data/no_injected_data
 # src/provider/kubernetes/installation/values.yaml
 # src/provider/kubernetes/dag_env/sql-conn-secret.yaml
 # **/.env

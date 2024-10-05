@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-dashboard-config
+  name: grafana-dashboard-model
   namespace: monitoring
   labels:
     grafana_dashboard: "1"
@@ -105,6 +105,7 @@ data:
             "y": 0
           },
           "id": 1,
+          "interval": "1h",
           "options": {
             "legend": {
               "calcs": [],
@@ -147,7 +148,7 @@ data:
               }
             }
           ],
-          "title": "Evolution of performance (recommendation and rating)",
+          "title": "Evolution of model performance ",
           "type": "timeseries"
         },
         {
@@ -162,11 +163,6 @@ data:
                 "mode": "palette-classic"
               },
               "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
                 "fillOpacity": 80,
                 "gradientMode": "none",
                 "hideFrom": {
@@ -175,11 +171,9 @@ data:
                   "viz": false
                 },
                 "lineWidth": 1,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
                 }
               },
               "mappings": [],
@@ -205,27 +199,18 @@ data:
             "x": 12,
             "y": 0
           },
-          "id": 3,
+          "id": 4,
           "options": {
-            "barRadius": 0,
-            "barWidth": 0.97,
-            "fullHighlight": false,
-            "groupWidth": 0.7,
             "legend": {
               "calcs": [],
               "displayMode": "list",
               "placement": "bottom",
               "showLegend": true
             },
-            "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
             "tooltip": {
               "mode": "single",
               "sort": "none"
-            },
-            "xTickLabelRotation": 0,
-            "xTickLabelSpacing": 0
+            }
           },
           "targets": [
             {
@@ -236,7 +221,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT $__timeGroupAlias(mur.timestamp, '60m'), \n       COUNT(mur.rating) AS Count_Rating_recommanded\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\nGROUP BY 1\nORDER BY 1;",
+              "rawSql": "SELECT mur.rating AS rating_after_recommandation\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\nand cast(mur.timestamp as date) >= current_date - interval '100' day;",
               "refId": "A",
               "sql": {
                 "columns": [
@@ -257,8 +242,8 @@ data:
               }
             }
           ],
-          "title": "Number of recommandation by hours",
-          "type": "barchart"
+          "title": "Histogram of evaluation after recommendation",
+          "type": "histogram"
         },
         {
           "datasource": {
@@ -277,8 +262,8 @@ data:
                 "axisColorMode": "text",
                 "axisLabel": "",
                 "axisPlacement": "auto",
-                "fillOpacity": 80,
-                "gradientMode": "none",
+                "fillOpacity": 32,
+                "gradientMode": "hue",
                 "hideFrom": {
                   "legend": false,
                   "tooltip": false,
@@ -316,9 +301,10 @@ data:
             "y": 8
           },
           "id": 2,
+          "interval": "1h",
           "options": {
-            "barRadius": 0,
-            "barWidth": 0.97,
+            "barRadius": 0.2,
+            "barWidth": 0.69,
             "fullHighlight": false,
             "groupWidth": 0.7,
             "legend": {
@@ -328,13 +314,13 @@ data:
               "showLegend": true
             },
             "orientation": "auto",
-            "showValue": "auto",
-            "stacking": "none",
+            "showValue": "always",
+            "stacking": "normal",
             "tooltip": {
               "mode": "single",
               "sort": "none"
             },
-            "xTickLabelRotation": 0,
+            "xTickLabelRotation": -45,
             "xTickLabelSpacing": 0
           },
           "pluginVersion": "11.2.0",
@@ -368,7 +354,7 @@ data:
               }
             }
           ],
-          "title": "Panel Title",
+          "title": "Rating after recommandation per kind",
           "transformations": [
             {
               "id": "groupToNestedTable",
@@ -390,6 +376,231 @@ data:
             }
           ],
           "type": "barchart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "grafana-postgresql-datasource",
+            "uid": "P145019923814B48D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "log": 10,
+                  "type": "log"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 5,
+          "interval": "1h",
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "vertical",
+            "showValue": "never",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "asc"
+            },
+            "xTickLabelRotation": -45,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "11.2.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "P145019923814B48D"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT s.genre, sum(CAST(mur.is_recommended AS INT4)) as \"movie_seen_with_reco\",\ncount(CAST(mur.is_recommended AS INT4)) as \"movie_seen_without_reco\"\nFROM   movies m\nCROSS  JOIN LATERAL string_to_table(m.genres, '|') AS s(genre)\ninner join movies_users_rating mur on m.\"movieId\" = mur.\"movieId\"\nGroup by s.genre",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Comparison between films seen with and without a recommendation",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "default": false,
+            "type": "grafana-postgresql-datasource",
+            "uid": "P145019923814B48D"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": true,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 6,
+            "y": 16
+          },
+          "id": 3,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "normal",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xField": "time",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "P145019923814B48D"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "SELECT $__timeGroupAlias(mur.timestamp, '60m'), \n       COUNT(mur.rating) AS Count_Rating_recommanded\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\nGROUP BY 1\nORDER BY 1;",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "Number of recommandation by hours",
+          "type": "barchart"
         }
       ],
       "schemaVersion": 39,
@@ -400,13 +611,13 @@ data:
         "list": []
       },
       "time": {
-        "from": "now-7d",
+        "from": "now-30d",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "browser",
-      "title": "Algorithme recommandation monitoring",
-      "uid": "fdz6aoqpcybr4d",
+      "title": "Algorithme recommandation monitoring v3",
+      "uid": "fdz6aoqpcybr4f",
       "version": 1,
       "weekStart": ""
     }
