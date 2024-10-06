@@ -3,8 +3,13 @@ import random
 from datetime import datetime
 import math
 import time
+
+print("### "*20)
+print(datetime.now().strftime('%Y-%m-%d, %H heure'))
+print("### "*20)
+
 hours = datetime.now().hour 
-affulence = math.cos(2*math.pi*((hours-20)/24))
+affulence = math.cos(2*math.pi*((hours-20)/24)) + 1
 
 api_host = "http://localhost:8000"
 
@@ -39,14 +44,14 @@ def ask_for_recommandation(payload_recommendations, headers):
 ### ####
 
 
-number_of_user = int(5 + 100*affulence + random.randint(a=1, b=25))
+number_of_user = int(5 + 50*affulence + random.randint(a=1, b=25))
 print("Affluence", number_of_user)
 
 for u in range(number_of_user):
     time.sleep(max(0, random.normalvariate(mu=3, sigma=10)))
     user_example = random.randint(a=1, b=130000)
-    print("\n"*3)
-    print("USER: ", user_example)
+    print("\n")
+    print("### USER: ", user_example, " ###")
     payload_recommendations = {
             "user": {
                 "userId": user_example
