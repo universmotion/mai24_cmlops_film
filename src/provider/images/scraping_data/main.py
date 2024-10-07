@@ -11,16 +11,17 @@ if "MAMBA_EXE" in os.environ:
 else:
     date = datetime.strptime(os.environ["DATE_FOLDER"], '%Y-%m-%d')
     data_path = Path("/app/data/to_ingest/")
-    
+
 
 def main():
-    
+
     print("## Debut de tache")
     try:
-        simulation_data_path = os.path.join(data_path, date.strftime("simulation_data/%Y/%m/%d"))
+        simulation_data_path = os.path.join(
+            data_path, date.strftime("simulation_data/%Y/%m/%d"))
 
         raw_data_path = os.path.join(data_path,  date.strftime("raw/%Y/%m/%d"))
-        
+
         os.makedirs(raw_data_path, exist_ok=True)
 
         list_files_to_copy = list(Path(simulation_data_path).glob("*.csv"))
@@ -33,7 +34,7 @@ def main():
 
     except Exception:
         return 0
-    return 1 
+    return 1
 
 
 if __name__ == "__main__":

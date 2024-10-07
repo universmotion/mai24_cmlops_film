@@ -13,9 +13,8 @@ def get_db() -> Session:
 
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
-        pool_size=20,       
-        max_overflow=10,    
+        pool_size=20,
+        max_overflow=10,
     )
-    
     Session = sessionmaker(engine)
     return Session()

@@ -12,8 +12,9 @@ if "MAMBA_EXE" in os.environ:
     date = datetime.now()
     data_path = Path("/home/romain/Documents/Formation/mai24_cmlops_film/data")
 else:
-    date =  datetime.strptime(os.environ["DATE_FOLDER"], '%Y-%m-%d')
+    date = datetime.strptime(os.environ["DATE_FOLDER"], '%Y-%m-%d')
     data_path = Path("/app/data/to_ingest")
+
 
 def load_db():
     db_user = os.environ["DB_USER"]
@@ -24,9 +25,10 @@ def load_db():
 
     conn_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}"
     engine = create_engine(conn_string)
-    
+
     Session = sessionmaker(engine)
     return Session()
+
 
 def main():
     docs_paths = list(data_path.glob("raw/**/*.csv"))
@@ -37,29 +39,33 @@ def main():
     schema = "%Y/%m/%d"
     docs_links_tables = [
         {
-            'path_or_df': os.path.join( data_path, "processed", date.strftime(schema), 'user_matrix.csv'), 
-            'table_name': 'users', 
+            'path_or_df': os.path.join(data_path, "processed",
+                                       date.strftime(schema), 'user_matrix.csv'),
+            'table_name': 'users',
             'schema': User
-        }, 
+        },
         {
-            'path_or_df': os.path.join( data_path, "raw", date.strftime(schema), 'movies.csv'),
-            'table_name': 'movies', 
+            'path_or_df': os.path.join(data_path, "raw",
+                                       date.strftime(schema), 'movies.csv'),
+            'table_name': 'movies',
             'schema': Movie
-        }, 
+        },
         {
-            'path_or_df': os.path.join( data_path, "raw", date.strftime(schema),  'ratings.csv'), 
-            'table_name': 'movies_users_rating', 
-            "change_col_type":{"timestamp":"timestamp"},
+            'path_or_df': os.path.join(data_path, "raw",
+                                       date.strftime(schema),  'ratings.csv'),
+            'table_name': 'movies_users_rating',
+            "change_col_type": {"timestamp": "timestamp"},
             'schema': MovieUserRating
         }
     ]
     db = load_db()
-    
+
     ds = DataSender(
         docs_links_tables=docs_links_tables, db_engine=db,
         data_path=data_path
-        )
+    )
     ds()
+
 
 if __name__ == "__main__":
     print("### Début de injestion des données par la db")
