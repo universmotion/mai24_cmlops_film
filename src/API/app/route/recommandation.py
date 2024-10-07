@@ -14,13 +14,14 @@ from dependancies import get_current_user
 from datamodel import Movie, MovieUserRating, User
 import pickle
 import os
-from pathlib import Path 
-import numpy as np
+from pathlib import Path
 from sklearn.neighbors import NearestNeighbors
 
 
 if "MAMBA_EXE" in os.environ:
     model_path = Path("/home/romain/Documents/Formation/mai24_cmlops_film/models")
+elif "CONFIG_MODE" in os.environ and os.environ["CONFIG_MODE"] == "testing":
+    model_path = Path("~/models")
 else:  
     model_path = Path("/app/data/models")
 
@@ -30,7 +31,10 @@ with open(path_model, mode="rb") as f:
 
 reco_router = APIRouter()
 
-## 
+
+# Schema
+
+
 class MovieSchema(BaseModel):
     """
     Schéma représentant un film et la note associée (facultative).
@@ -42,6 +46,7 @@ class MovieSchema(BaseModel):
     moviesId: int
     rating: Optional[float] = 0.
 
+
 class ListMovieSchema(BaseModel):
     """
     Schéma représentant une liste de films avec leurs notes.
@@ -51,6 +56,7 @@ class ListMovieSchema(BaseModel):
     """
     listMovie: Optional[List[MovieSchema]]
 
+
 class UserSchema(BaseModel):
     """
     Schéma représentant un utilisateur.
@@ -59,7 +65,6 @@ class UserSchema(BaseModel):
     - userId : Identifiant de l'utilisateur (facultatif).
     """
     userId: Optional[int] = None
-
 
 
 def create_user(db: Session) -> int:
@@ -83,7 +88,8 @@ def create_user(db: Session) -> int:
         db.refresh(new_user)
         return new_user.userId
     except SQLAlchemyError:
-        raise HTTPException(status_code=500, detail="Error creating user in database")
+        raise HTTPException(status_code=500, 
+                            detail="Error creating user in database")
 
 
 def get_user_history(db: Session, user_id: int) -> List[int]:
@@ -101,12 +107,15 @@ def get_user_history(db: Session, user_id: int) -> List[int]:
     - Une liste d'identifiants de films vus par l'utilisateur.
     """
     try:
-        history = db.query(MovieUserRating.movieId).filter(MovieUserRating.userId == user_id).all()
+        history = db.query(MovieUserRating.movieId).filter(
+            MovieUserRating.userId == user_id).all()
         return [row.movieId for row in history]
     except SQLAlchemyError:
-        raise HTTPException(status_code=500, detail="Error fetching user history")
+        raise HTTPException(status_code=500,
+                            detail="Error fetching user history")
 
-def update_failed_insert(db: Session, failed_insert:dict) -> list:
+
+def update_failed_insert(db: Session, failed_insert: dict) -> list:
     """
     Met à jour les enregistrements de films ayant échoué lors de l'insertion initiale.
 
