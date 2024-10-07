@@ -19,26 +19,25 @@ from sklearn.neighbors import NearestNeighbors
 
 
 if "MAMBA_EXE" in os.environ:
-    model_path = Path("/home/romain/Documents/Formation/mai24_cmlops_film/models")
+    model_path = Path(
+        "/home/romain/Documents/Formation/mai24_cmlops_film/models/model.pkl")
 elif "CONFIG_MODE" in os.environ and os.environ["CONFIG_MODE"] == "testing":
-    model_path = Path("~/models")
-else:  
-    model_path = Path("/app/data/models")
+    model_path = Path("/home/runner/work/mai24_cmlops_film/mai24_cmlops_film/models/model.pkl")
+    print(model_path)
+else:
+    model_path = Path("/app/data/models/model.pkl")
 
-path_model = list(model_path.glob("*.pkl"))[0]
-with open(path_model, mode="rb") as f:
+with open(model_path, mode="rb") as f:
     MODEL = pickle.load(f)
 
 reco_router = APIRouter()
 
 
 # Schema
-
-
 class MovieSchema(BaseModel):
     """
     Schéma représentant un film et la note associée (facultative).
-    
+
     Attributs :
     - moviesId : Identifiant du film.
     - rating : Note associée au film, par défaut 0.
@@ -50,7 +49,7 @@ class MovieSchema(BaseModel):
 class ListMovieSchema(BaseModel):
     """
     Schéma représentant une liste de films avec leurs notes.
-    
+
     Attributs :
     - listMovie : Liste de films et de leurs notes (facultative).
     """
@@ -60,7 +59,7 @@ class ListMovieSchema(BaseModel):
 class UserSchema(BaseModel):
     """
     Schéma représentant un utilisateur.
-    
+
     Attributs :
     - userId : Identifiant de l'utilisateur (facultatif).
     """
@@ -88,7 +87,7 @@ def create_user(db: Session) -> int:
         db.refresh(new_user)
         return new_user.userId
     except SQLAlchemyError:
-        raise HTTPException(status_code=500, 
+        raise HTTPException(status_code=500,
                             detail="Error creating user in database")
 
 
@@ -135,9 +134,9 @@ def update_failed_insert(db: Session, failed_insert: dict) -> list:
     """
     failed_updates = []
     for obj in failed_insert:
-        user_id   = obj["userId"]
-        movie_id  = obj["movieId"]
-        rating    = obj["rating"]
+        user_id = obj["userId"]
+        movie_id = obj["movieId"]
+        rating = obj["rating"]
         timestamp = obj["timestamp"]
         try:
             db.query(MovieUserRating).filter_by(userId=user_id, movieId=movie_id).update({
@@ -145,7 +144,7 @@ def update_failed_insert(db: Session, failed_insert: dict) -> list:
                 'timestamp': timestamp
             })
             db.commit()
-        except SQLAlchemyError as update_error:
+        except SQLAlchemyError:
             db.rollback()
             failed_updates.append(obj)
     return failed_updates
@@ -174,12 +173,13 @@ def add_movies_to_user(db: Session, user_id: int, movies: List[MovieSchema]) -> 
         movie_id = movie.moviesId
         rating = movie.rating
         try:
-            new_rating = MovieUserRating(
-                userId=user_id,
-                movieId=movie_id,
-                rating=rating,
-                timestamp=pd.Timestamp.now().round(freq='s')
-            )
+            data_movie_user_rating = {
+                    "userId": user_id,
+                    "movieId": movie_id,
+                    "rating": rating,
+                    "timestamp": pd.Timestamp.now().round(freq='s')
+            }
+            new_rating = MovieUserRating(**data_movie_user_rating)
             db.add(new_rating)
             db.commit()
             counter_new_movies += 1
@@ -187,30 +187,27 @@ def add_movies_to_user(db: Session, user_id: int, movies: List[MovieSchema]) -> 
         except IntegrityError as e:
             db.rollback()
             if "unique constraint" in str(e.orig):
-                failed_insert.append({
-                    "userId":user_id,
-                    "movieId":movie_id,
-                    "rating":rating,
-                    "timestamp":pd.Timestamp.now().round(freq='s')
-                })
+                failed_insert.append(data_movie_user_rating)
             elif "foreign key constraint" in str(e.orig):
-                print(f"Erreur de clé étrangère : le film {movie_id} ou l'utilisateur {user_id} n'existe pas.")
+                print(
+                    f"Erreur de clé étrangère : le film {movie_id} ou l'utilisateur {user_id} n'existe pas.")
             else:
                 print(f"Erreur d'intégrité : {str(e.orig)}")
 
-        except SQLAlchemyError as e:
+        except SQLAlchemyError:
             db.rollback()
-            raise HTTPException(status_code=500, detail="Error adding movies to user history")
-    
+            raise HTTPException(
+                status_code=500, detail="Error adding movies to user history")
+
     failed_updates = update_failed_insert(db, failed_insert)
-    
+
     if failed_updates:
         df = pd.DataFrame(failed_updates)
-        df.to_csv(f'failed_movie_updates_{str(int(datetime.now().timestamp()))}.csv', index=False)
+        df.to_csv(
+            f'failed_movie_updates_{str(int(datetime.now().timestamp()))}.csv', index=False)
         print("Données des échecs sauvegardées dans 'failed_movie_updates.csv'.")
 
     return counter_new_movies
-
 
 
 def set_new_features(db: Session, user_id: int) -> None:
@@ -233,7 +230,8 @@ def set_new_features(db: Session, user_id: int) -> None:
         )
 
         df = pd.DataFrame(result, columns=["userId", "genres"])
-        df = pd.concat([df["userId"], df["genres"].str.get_dummies(sep="|")], axis=1)
+        df = pd.concat(
+            [df["userId"], df["genres"].str.get_dummies(sep="|")], axis=1)
         user_vector = df.groupby("userId").mean()
 
         user_features = user_vector.to_dict(orient="index").get(user_id, {})
@@ -243,10 +241,11 @@ def set_new_features(db: Session, user_id: int) -> None:
 
     except SQLAlchemyError:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Error setting new features to user")
+        raise HTTPException(
+            status_code=500, detail="Error setting new features to user")
 
 
-def recommend_movie(db: Session, seen_movies: List[int], user_id:int) -> Dict:
+def recommend_movie(db: Session, seen_movies: List[int], user_id: int) -> Dict:
     """
     Recommande un nouveau film à un utilisateur en évitant les films déjà vus.
 
@@ -263,9 +262,9 @@ def recommend_movie(db: Session, seen_movies: List[int], user_id:int) -> Dict:
     - Un dictionnaire contenant l'identifiant et le titre du film recommandé.
     """
     try:
-        
+
         users = pd.read_sql(
-            db.query(User).filter(User.userId == user_id).statement, 
+            db.query(User).filter(User.userId == user_id).statement,
             db.bind
         ).drop(["userId", "count_movies"], axis=1)
         _, indices = MODEL.kneighbors(users[MODEL.feature_names_in_])
@@ -282,9 +281,11 @@ def recommend_movie(db: Session, seen_movies: List[int], user_id:int) -> Dict:
         if movie:
             return {"movieId": movie.movieId, "title": movie.title}
         else:
-            raise HTTPException(status_code=404, detail="No new movies to recommend")
-    except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=404, detail="No new movies to recommend")
+    except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Error recommending movie")
+
 
 def save_recommandation(db: Session, output: Dict) -> bool:
     """
@@ -313,15 +314,14 @@ def save_recommandation(db: Session, output: Dict) -> bool:
         )
         db.add(new_rating)
         db.commit()
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Error recording recommendation")
-
-
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=500, detail="Error recording recommendation")
 
 
 @reco_router.post("/recommendations", tags=["Recommendation"])
 async def post_recommendation(
-    user: UserSchema, list_movie: ListMovieSchema, 
+    user: UserSchema, list_movie: ListMovieSchema,
     db_engine: Session = Depends(get_db), current_client: str = Depends(get_current_user)
 ) -> Dict:
     """
@@ -345,7 +345,8 @@ async def post_recommendation(
         is_new_user = False
         connection = db_engine
         if not user.userId and len(list_movie.listMovie) == 0:
-            raise HTTPException(status_code=400, detail="Missing movie history")
+            raise HTTPException(
+                status_code=400, detail="Missing movie history")
         elif not user.userId:
             user_id = create_user(connection)
             is_new_user = True
@@ -355,18 +356,20 @@ async def post_recommendation(
             raise HTTPException(status_code=400, detail="User doesn't exist")
 
         if len(list_movie.listMovie) > 0:
-            count_new_movies_added = add_movies_to_user(connection, user_id, list_movie.listMovie)
+            count_new_movies_added = add_movies_to_user(
+                connection, user_id, list_movie.listMovie)
         else:
             count_new_movies_added = 0
-        
+
         if count_new_movies_added == 0 and is_new_user:
-            raise HTTPException(status_code=400, detail="Missing movie history (Movie ids provided doesn't exist)")
+            raise HTTPException(
+                status_code=400, detail="Missing movie history (Movie ids provided doesn't exist)")
         seen_movies = get_user_history(connection, user_id)
-        
+
         recommendation = recommend_movie(connection, seen_movies, user_id)
         output = {"userId": user_id, "recommendation": recommendation}
         save_recommandation(connection, output)
-        return output 
+        return output
 
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error")
