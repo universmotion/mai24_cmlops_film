@@ -6,6 +6,8 @@ kubectl create namespace airflow
 helm repo add apache-airflow https://airflow.apache.org
 sudo kubectl config set-context --current --namespace=airflow
 
+kubectl create secret generic mydatabase --from-literal=connection=postgresql://admin:admin@10.43.150.34:5432/postgres
+
 ## Log / dag / data folder 
 kubectl create -f ./src/provider/kubernetes/installation/airflow-local-dags-folder-pv-pvc.yaml
 kubectl create -f ./src/provider/kubernetes/installation/airflow-local-logs-folder-pv-pvc.yaml
