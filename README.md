@@ -1,7 +1,7 @@
 Movie recommandation system API 
 ==============================
 
-This project is a starting Pack for MLOps projects based on the subject "movie_recommandation". It's not perfect so feel free to make some modifications on it.
+This project is dedicated to streaming platforms such as Netflix, prime, etc... We recommend movies for your users based on their movie history. [List of movies](./data/external/movies.csv) that we can recommend (it's updated each day).
 
 ## A - Project Organization
 
