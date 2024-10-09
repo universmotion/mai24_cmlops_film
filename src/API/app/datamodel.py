@@ -1,27 +1,26 @@
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, Integer,\
-    Float, ForeignKey, Boolean, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, TIMESTAMP
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
 import uuid
 
 Base = declarative_base()
 
+
 class Client(Base):
     """
-    Classe représentant les clients dans la base de données.
-    
-    Attributs :
-    - id : UUID unique pour identifier chaque client.
-    - username : Nom d'utilisateur unique.
-    - name : Nom du client.
-    - email : Adresse email unique du client.
-    - hashed_password : Mot de passe chiffré du client.
+    Class representing clients in the database.
+
+    Attributes:
+    - id: A unique UUID to identify each client.
+    - username: Unique username for the client.
+    - name: Client's name.
+    - email: Client's unique email address.
+    - hashed_password: Encrypted password for the client.
     """
-    
     __tablename__ = "clients"
-    
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                default=uuid.uuid4, unique=True, index=True)
     username = Column(String, unique=True, index=True)
     name = Column(String)
     email = Column(String, unique=True)
@@ -30,34 +29,31 @@ class Client(Base):
 
 class Movie(Base):
     """
-    Classe représentant les films dans la base de données.
+    Class representing movies in the database.
 
-    Attributs :
-    - movieId : Identifiant unique du film, auto-incrémenté.
-    - title : Titre du film (peut être nul).
-    - genres : Liste des genres associés au film sous forme de chaîne de caractères (peut être nul).
+    Attributes:
+    - movieId: Unique identifier for the movie, auto-incremented.
+    - title: Title of the movie (can be null).
+    - genres: List of genres associated with the movie, stored as a string (can be null).
     """
-    
     __tablename__ = 'movies'
-
     movieId = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=True)
     genres = Column(String, nullable=True)
 
+
 class User(Base):
     """
-    Classe représentant les utilisateurs avec des préférences de genres.
+    Class representing users with genre preferences.
 
-    Attributs :
-    - userId : Identifiant unique de l'utilisateur, auto-incrémenté.
-    - count_movies : Nombre de films associés à l'utilisateur.
-    - Divers genres de films avec des scores, chaque genre est représenté par une colonne Float.
-      Les genres incluent Action, Adventure, Animation, Comedy, etc.
-    - no_genres_listed : Colonne représentant les films sans genres listés.
+    Attributes:
+    - userId: Unique identifier for the user, auto-incremented.
+    - count_movies: Number of movies associated with the user.
+    - Various movie genres, each represented by a Float column.
+      The genres include Action, Adventure, Animation, Comedy, etc.
+    - no_genres_listed: Column representing movies without listed genres.
     """
-    
     __tablename__ = 'users'
-
     userId = Column(Integer, primary_key=True, autoincrement=True)
     count_movies = Column(Integer, default=0)
     no_genres_listed = Column(Float, default=0)
@@ -81,29 +77,31 @@ class User(Base):
     War = Column(Float, default=0)
     Western = Column(Float, default=0)
 
+
 class MovieUserRating(Base):
     """
-    Classe représentant l'association entre les utilisateurs et les films, avec leur note et un timestamp.
+    Class representing the association between users and movies, with ratings and a timestamp.
 
-    Attributs :
-    - userId : Clé étrangère vers la table 'users', identifiant l'utilisateur.
-    - movieId : Clé étrangère vers la table 'movies', identifiant le film.
-    - rating : Note attribuée par l'utilisateur au film.
-    - timestamp : Timestamp de la note donnée par l'utilisateur.
-    
-    Relations :
-    - user : Relation vers la classe User, avec un backref 'movie_ratings'.
-    - movie : Relation vers la classe Movie, avec un backref 'user_ratings'.
+    Attributes:
+    - userId: Foreign key to the 'users' table, identifying the user.
+    - movieId: Foreign key to the 'movies' table, identifying the movie.
+    - rating: The rating given by the user to the movie.
+    - timestamp: Timestamp of when the rating was given.
+    - is_recommended: Indicates if the movie was recommended.
+    - is_use_to_train: Indicates if the rating is used for training purposes.
+
+    Relationships:
+    - user: Relationship to the User class, with a backref 'movie_ratings'.
+    - movie: Relationship to the Movie class, with a backref 'user_ratings'.
     """
-    
     __tablename__ = 'movies_users_rating'
-
-    userId = Column(Integer, ForeignKey('users.userId', ondelete="CASCADE"), primary_key=True)
-    movieId = Column(Integer, ForeignKey('movies.movieId', ondelete="CASCADE"), primary_key=True)
+    userId = Column(Integer, ForeignKey(
+        'users.userId', ondelete="CASCADE"), primary_key=True)
+    movieId = Column(Integer, ForeignKey('movies.movieId',
+                     ondelete="CASCADE"), primary_key=True)
     rating = Column(Float, nullable=True)
     timestamp = Column(TIMESTAMP, server_default=func.now())
     is_recommended = Column(Boolean, default=False)
     is_use_to_train = Column(Boolean, default=False)
-
     user = relationship("User", backref="movie_ratings")
     movie = relationship("Movie", backref="user_ratings")

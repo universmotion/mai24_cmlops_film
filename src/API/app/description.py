@@ -3,7 +3,7 @@ description = """ # Documentation de l'API de Recommandation de Films
 Cette API permet de gérer un système de recommandations de films pour les utilisateurs. Elle gère les utilisateurs, leurs historiques de films, et propose des recommandations basées sur les films déjà vus.
 Les clients sont les divers plateformes de streaming qui souhaites que leur utiliseurs reçoit des recommandations.
 
-### Remarque 
+### Remarque
 Attentions, les clients ne sont pas utilisateurs. Au sein de l'api, les clients sont des plateformes comme netflix, prime, etc...
 
 ## Authentification
