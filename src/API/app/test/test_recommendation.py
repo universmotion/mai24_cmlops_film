@@ -39,7 +39,7 @@ def test_create_user(db_session):
     with pytest.raises(HTTPException) as excinfo:
         create_user(db_session)
     assert excinfo.value.status_code == 500
-    assert excinfo.value.detail == "Error creating user in database"
+    assert excinfo.value.detail == "Error creating user in the database"
 
 
 def test_get_user_history(db_session):
