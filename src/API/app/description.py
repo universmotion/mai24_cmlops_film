@@ -1,26 +1,32 @@
-description = """ # Documentation de l'API de Recommandation de Films
+description = """
 ## Description
-Cette API permet de gérer un système de recommandations de films pour les utilisateurs. Elle gère les utilisateurs, leurs historiques de films, et propose des recommandations basées sur les films déjà vus.
-Les clients sont les divers plateformes de streaming qui souhaites que leur utiliseurs reçoit des recommandations.
 
-### Remarque
-Attentions, les clients ne sont pas utilisateurs. Au sein de l'api, les clients sont des plateformes comme netflix, prime, etc...
+This API manages a movie recommendation system for users. It handles user data, their movie watch history, and offers recommendations based on the movies they have already seen.
 
-## Authentification
-L'API utilise un système d'authentification OAuth2 avec des tokens JWT. Les utilisateurs doivent être authentifiés pour accéder aux routes protégées.
+The clients are various streaming platforms that want their users to receive recommendations.
 
-## Gestion des erreurs
+### Note
 
-Les principales erreurs incluent :
+Be aware that clients are not the users. In the context of this API, clients are platforms like Netflix, Prime, etc.
 
-- 400 Bad Request : Données manquantes ou incorrectes.
-- 401 Unauthorized : Token JWT invalide ou manquant.
-- 404 Not Found : Ressource non trouvée (comme un film ou un utilisateur).
-- 500 Internal Server Error : Erreur interne côté serveur (ex: base de données).
+## Authentication
 
-## Sécurité
-L'API utilise OAuth2 avec un flux password pour l'authentification des utilisateurs. Les tokens JWT sont utilisés pour sécuriser les routes et vérifier l'identité des utilisateurs.
+The API uses an OAuth2 authentication system with JWT tokens. Users must be authenticated to access protected routes.
 
-## Auteurs
-Développée par l'équipe DS.
+## Error Management
+
+The main errors include:
+
+- **400 Bad Request**: Missing or incorrect data.
+- **401 Unauthorized**: Invalid or missing JWT token.
+- **404 Not Found**: Resource not found (such as a movie or user).
+- **500 Internal Server Error**: Internal server error (e.g., database issue).
+
+## Security
+
+The API uses OAuth2 with the password flow for user authentication. JWT tokens are used to secure the routes and verify user identity.
+
+## Authors
+
+Developed by the DS team.
 """
