@@ -9,7 +9,7 @@ spec:
   capacity:
     storage: 500Mi
   accessModes:
-    - ReadWriteOnce
+    - ReadOnlyMany
   hostPath: 
     path: "/home/romain/Documents/Formation/mai24_cmlops_film/models"
 ---
@@ -20,7 +20,7 @@ metadata:
 spec:
   storageClassName: local-path
   accessModes:
-    - ReadWriteOnce
+    - ReadOnlyMany
   resources:
     requests:
       storage: 500Mi
