@@ -68,6 +68,30 @@ class UserSchema(BaseModel):
     userId: Optional[int] = None
 
 
+class MovieRecommendedSchema(BaseModel):
+    """
+    Schema representing a movie recommendation.
+
+    Attributes:
+    - movieId: Movie identifier.
+    - title: Movie title.
+    """
+    movieId: int
+    title: str
+
+
+class ResponseRecommendationSchema(BaseModel):
+    """
+    Schema representing a recommendation.
+
+    Attributes:
+    - userId: User identifier.
+    - recommendation: a movie recommended schema.
+    """
+    userId: int = None
+    recommendation: MovieRecommendedSchema
+
+
 def create_user(db: Session) -> int:
     """
     Creates a new user in the database by assigning them a new unique ID.
@@ -173,7 +197,7 @@ def add_movies_to_user(db: Session, user_id: int, movies: List[MovieSchema]) -> 
 
     for movie in movies:
         movie_id = movie.moviesId
-        rating = movie.rating
+        rating = max(0, min(5, movie.rating))
         try:
             data_movie_user_rating = {
                 "userId": user_id,
@@ -322,26 +346,66 @@ def save_recommendation(db: Session, output: Dict) -> bool:
         )
 
 
-@reco_router.post("/recommendations", tags=["Recommendation"])
+@reco_router.post("/recommendations", tags=["Recommendation"],
+                  response_model=ResponseRecommendationSchema)
 async def post_recommendation(
     user: UserSchema, list_movie: ListMovieSchema,
-    db_engine: Session = Depends(get_db), current_client: str = Depends(get_current_user)
+    db_engine: Session = Depends(get_db),
+    current_client: str = Depends(get_current_user)
 ) -> Dict:
     """
-    Endpoint to recommend a movie to a user.
+    This request recommends a movie to a user based on their watched history. If the user doesn't exist, a new user is created, and their movie history is saved before making a recommendation.
 
-    If the user does not exist, they are created. Watched movies are added to their history. A movie recommendation is then made from unwatched films.
+    ### Request Parameters
 
-    Arguments:
-    - user: Schema representing the user.
-    - list_movie: List of movies with their ratings.
+    - **user**: An object representing the user.
+        - **userId** (nullable integer): The unique ID of the user. If **null**, a new user will be created.
 
-    Exceptions:
-    - HTTP 400: If the user or movie history is missing.
-    - HTTP 500: In case of a database error.
+    - **list_movie**: An object containing the user's watched movies.
+        - **listMovie** (array): A list of objects where each object represents a movie with its ID and rating.
+            - **moviesId** (integer): The ID of the watched movie. Id is based on our list, see: [List of moviesId](https://github.com/universmotion/mai24_cmlops_film/blob/master/data/external/movies.csv)
+            - **rating** (integer): The user's rating for the movie.
 
-    Returns:
-    - A dictionary containing the user ID and the movie recommendation.
+    ### Example Requests
+
+    1. **New User with Watch History**
+    ```json
+    {
+        "user": {
+            "userId": null
+        },
+        "list_movie": {
+            "listMovie": [
+                {
+                "moviesId": 1,
+                "rating": 5
+                }
+            ]
+        }
+    }
+    ```
+
+    2. **Existing User Requesting a New Recommendation**
+    ```json
+    {
+        "user": {
+            "userId": 138479
+            },
+            "list_movie": {
+                "listMovie": []
+        }
+    }
+    ```
+
+    - **Errors**:
+        - HTTP 400: Missing user or movie history.
+        - HTTP 422: Validation Error (of json).
+        - HTTP 500: Internal database error.
+
+    ### Key Conditions
+
+    - **New user**: When **userId** is **null** and there is at least one movie in the **listMovie**, a user is created and a recommendation is returned.
+    - **Existing user**: If **userId** exists, recommendations can be made based on the user's past history or a new set of watched movies.
     """
     try:
         is_new_user = False
