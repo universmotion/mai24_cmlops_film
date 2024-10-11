@@ -127,7 +127,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT $__timeGroupAlias(mur.timestamp, '60m'), \n       AVG(mur.rating) AS AVG_Rating_recommanded\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\nGROUP BY 1\nORDER BY 1;",
+              "rawSql": "SELECT date_trunc('hour', mur.timestamp) as date_reco, \n       AVG(mur.rating * cast(mur.is_recommended as INTEGER)) AS \"Avg rating of movie recommended\",\n       AVG(mur.rating) AS \"Avg rating of movie not recommended\"\nFROM \"movies_users_rating\" mur\nWHERE  mur.rating IS NOT NULL\nand mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'\nGROUP BY 1\nORDER BY date_reco desc;",
               "refId": "A",
               "sql": {
                 "columns": [
@@ -221,7 +221,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT mur.rating AS rating_after_recommandation\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\nand cast(mur.timestamp as date) >= current_date - interval '100' day;",
+              "rawSql": "SELECT mur.rating AS rating_after_recommandation\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\n  and mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}';",
               "refId": "A",
               "sql": {
                 "columns": [
@@ -333,7 +333,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT s.genre, mur.rating\nFROM   movies m\nCROSS  JOIN LATERAL string_to_table(m.genres, '|') AS s(genre)\ninner join movies_users_rating mur on m.\"movieId\" = mur.\"movieId\"\nwhere is_recommended is true \nand mur.rating is not null",
+              "rawSql": "SELECT\n  s.genre,\n  mur.rating\nFROM\n  movies m\n  CROSS JOIN LATERAL string_to_table(m.genres, '|') AS s(genre)\n  inner join movies_users_rating mur on m.\"movieId\" = mur.\"movieId\"\nwhere\n  is_recommended is true\n  and mur.rating is not null\n  and mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'",
               "refId": "A",
               "sql": {
                 "columns": [
@@ -467,7 +467,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT s.genre, sum(CAST(mur.is_recommended AS INT4)) as \"movie_seen_with_reco\",\ncount(CAST(mur.is_recommended AS INT4)) as \"movie_seen_without_reco\"\nFROM   movies m\nCROSS  JOIN LATERAL string_to_table(m.genres, '|') AS s(genre)\ninner join movies_users_rating mur on m.\"movieId\" = mur.\"movieId\"\nGroup by s.genre",
+              "rawSql": "SELECT s.genre, sum(CAST(mur.is_recommended AS INT4)) as \"movie_seen_with_reco\",\ncount(CAST(mur.is_recommended AS INT4)) as \"movie_seen_without_reco\"\nFROM   movies m\nCROSS  JOIN LATERAL string_to_table(m.genres, '|') AS s(genre)\ninner join movies_users_rating mur on m.\"movieId\" = mur.\"movieId\"\nwhere mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'\nGroup by s.genre",
               "refId": "A",
               "sql": {
                 "columns": [
@@ -566,7 +566,7 @@ data:
               "sort": "none"
             },
             "xField": "time",
-            "xTickLabelRotation": 0,
+            "xTickLabelRotation": -45,
             "xTickLabelSpacing": 0
           },
           "targets": [
@@ -578,7 +578,7 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT $__timeGroupAlias(mur.timestamp, '60m'), \n       COUNT(mur.rating) AS Count_Rating_recommanded\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\nGROUP BY 1\nORDER BY 1;",
+              "rawSql": "SELECT $__timeGroupAlias(mur.timestamp, '60m'), \n       COUNT(mur.rating) AS Count_Rating_recommanded\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\n  and mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'\nGROUP BY 1\nORDER BY 1;",
               "refId": "A",
               "sql": {
                 "columns": [
@@ -603,20 +603,22 @@ data:
           "type": "barchart"
         }
       ],
+      "refresh": "",
       "schemaVersion": 39,
       "tags": [
-        "Model"
+        "Model",
+        "Reco"
       ],
       "templating": {
         "list": []
       },
       "time": {
-        "from": "now-30d",
+        "from": "now-2d",
         "to": "now"
       },
       "timepicker": {},
       "timezone": "browser",
-      "title": "Algorithme recommandation monitoring",
+      "title": "Algorithm recommandation monitoring",
       "uid": "fdz6aoqpcybr4f",
       "version": 1,
       "weekStart": ""
