@@ -1,0 +1,13 @@
+name: recommendation_sys_api
+
+conda_env : conda_env.yaml 
+#  mlflow run . --experiment-name System_reco -P algorithm="ball_tree" --env-manager local
+
+entry_points:
+  main:
+    parameters:
+      n_neighbors: {type: int, default: 20}
+      algorithm: {type: str, default: "auto"}
+      moyenne_ponderer: {type: bool, default: True}
+    command: "python3 train.py {n_neighbors} {algorithm} {moyenne_ponderer}"
+

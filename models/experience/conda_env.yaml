@@ -1,0 +1,16 @@
+name: mlflow
+channels:
+- conda-forge
+- pkgs/main
+dependencies:
+  - python=3.1°
+  - pip
+  - pip:
+      - mlflow
+      - pandas
+      - cloudpickle
+      - numpy
+      - packaging
+      - pyyaml
+      - scikit-learn
+      - scipy
