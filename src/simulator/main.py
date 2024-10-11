@@ -35,14 +35,13 @@ def ask_for_recommandation(payload_recommendations, headers):
     payload_recommendations["list_movie"]["listMovie"][0]["rating"] = rating
     response_recommendations = requests.post(
         recommendations_url, json=payload_recommendations, headers=headers)
-
     if response_recommendations.status_code == 200:
         reco = response_recommendations.json().get("recommendation")
         print("Reçu avec comme film reco", reco)
         return reco["movieId"]
     else:
         print(
-            f"Erreur lors de l'envoi des recommandations: {response_recommendations.status_code}")
+            f"Erreur lors de l'envoi des recommandations: erreur code {response_recommendations.status_code}")
 
 
 #
@@ -52,7 +51,7 @@ doc = Path("/home/romain/Documents/Formation/mai24_cmlops_film/data/processed")\
 doc = list(doc)
 users = pd.concat(
     [pd.read_csv(d, sep=",") for d in doc],
-    axis=1
+    axis=0
 )
 u_id = users["userId"]
 
@@ -78,7 +77,6 @@ for user_example in random_users_list:
             ]
         }
     }
-
     number_rating = random.randint(a=2, b=10)
 
     if response_token.status_code == 200:
