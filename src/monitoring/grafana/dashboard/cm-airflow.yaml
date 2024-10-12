@@ -29,6 +29,7 @@ data:
       "fiscalYearStartMonth": 0,
       "gnetId": 20994,
       "graphTooltip": 0,
+      "id": 33,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -112,7 +113,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(airflow_scheduler_heartbeat)",
+              "expr": "sum by (__name__) (airflow_scheduler_heartbeat) ",
               "interval": "",
               "legendFormat": "__auto",
               "range": true,
@@ -441,7 +442,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(airflow_ti_successes)",
+              "expr": "sum(airflow_ti_successes{})",
               "interval": "",
               "legendFormat": "__auto",
               "range": true,
@@ -513,32 +514,7 @@ data:
               },
               "unit": "short"
             },
-            "overrides": [
-              {
-                "__systemRef": "hideSeriesFrom",
-                "matcher": {
-                  "id": "byNames",
-                  "options": {
-                    "mode": "exclude",
-                    "names": [
-                      "{instance=\"10.42.0.15:9102\", job=\"airflow\", operator=\"KubernetesPodOperator\"}"
-                    ],
-                    "prefix": "All except:",
-                    "readOnly": true
-                  }
-                },
-                "properties": [
-                  {
-                    "id": "custom.hideFrom",
-                    "value": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": true
-                    }
-                  }
-                ]
-              }
-            ]
+            "overrides": []
           },
           "gridPos": {
             "h": 6,
@@ -567,7 +543,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum by(operator) (rate(airflow_operator_successes[1m])*60)",
+              "expr": "sum(rate(\nairflow_dag_processing_last_duration_count[1m]) * 60)",
               "interval": "",
               "legendFormat": "{{operator_name}}",
               "range": true,
@@ -668,7 +644,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum by (operator)(airflow_operator_failures)",
+              "expr": "sum(airflow_dagrun_failed_sum)",
               "interval": "",
               "legendFormat": "{{operator_name}}",
               "range": true,
@@ -684,7 +660,6 @@ data:
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "description": "Zombie tasks killed",
           "fieldConfig": {
             "defaults": {
               "mappings": [],
@@ -707,7 +682,7 @@ data:
             "x": 20,
             "y": 5
           },
-          "id": 57,
+          "id": 53,
           "options": {
             "colorMode": "value",
             "graphMode": "area",
@@ -733,14 +708,14 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(airflow_zombies_killed)",
+              "expr": "sum(airflow_executor_queued_tasks)",
               "interval": "",
               "legendFormat": "",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "Zombies killed",
+          "title": "Executor queued tasks",
           "type": "stat"
         },
         {
@@ -834,7 +809,7 @@ data:
           },
           "gridPos": {
             "h": 6,
-            "w": 16,
+            "w": 20,
             "x": 0,
             "y": 12
           },
@@ -859,7 +834,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(airflow_job_start[1m]) * 60)",
+              "expr": "sum(rate(airflow_job_start{}[1m]) * 60)",
               "instant": false,
               "interval": "",
               "legendFormat": "{{job_name}}",
@@ -894,75 +869,10 @@ data:
           "gridPos": {
             "h": 6,
             "w": 4,
-            "x": 16,
-            "y": 12
-          },
-          "id": 10,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "area",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "pluginVersion": "11.2.1",
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "sum(airflow_executor_open_slots{})",
-              "instant": false,
-              "interval": "1",
-              "intervalFactor": 1,
-              "legendFormat": "",
-              "refId": "A"
-            }
-          ],
-          "title": "Executor open slots",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "default": true,
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "noValue": "0",
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 4,
             "x": 20,
             "y": 12
           },
-          "id": 53,
+          "id": 55,
           "options": {
             "colorMode": "value",
             "graphMode": "area",
@@ -988,14 +898,14 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(airflow_executor_queued_tasks)",
+              "expr": "sum(airflow_executor_running_tasks)",
               "interval": "",
               "legendFormat": "",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "Executor queued tasks",
+          "title": "Executor running tasks",
           "type": "stat"
         },
         {
@@ -1062,8 +972,8 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 5,
-            "w": 16,
+            "h": 6,
+            "w": 20,
             "x": 0,
             "y": 18
           },
@@ -1121,12 +1031,12 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 5,
+            "h": 6,
             "w": 4,
             "x": 20,
             "y": 18
           },
-          "id": 55,
+          "id": 10,
           "options": {
             "colorMode": "value",
             "graphMode": "area",
@@ -1152,14 +1062,15 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(airflow_executor_running_tasks)",
-              "interval": "",
+              "expr": "sum(airflow_executor_open_slots{})",
+              "instant": false,
+              "interval": "1",
+              "intervalFactor": 1,
               "legendFormat": "",
-              "range": true,
               "refId": "A"
             }
           ],
-          "title": "Executor running tasks",
+          "title": "Executor open slots",
           "type": "stat"
         },
         {
@@ -1172,7 +1083,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 23
+            "y": 24
           },
           "id": 47,
           "panels": [],
@@ -1255,7 +1166,7 @@ data:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 24
+            "y": 25
           },
           "id": 25,
           "options": {
@@ -1278,7 +1189,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "airflow_dagrun_duration_success",
+              "expr": "sum(airflow_dag_processing_processes{} )",
               "format": "time_series",
               "interval": "",
               "legendFormat": "{{dag_id}} p{{quantile}}",
@@ -1287,107 +1198,6 @@ data:
             }
           ],
           "title": "Success DAG run duration",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "default": true,
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "description": "Seconds taken for a DagRun to reach failed state",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 24,
-            "x": 0,
-            "y": 32
-          },
-          "id": 58,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "10.4.0",
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "editorMode": "code",
-              "expr": "airflow_dagrun_failed",
-              "format": "time_series",
-              "interval": "",
-              "legendFormat": "{{dag_id}} p{{quantile}}",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Failed DAG run duration",
           "type": "timeseries"
         },
         {
@@ -1458,7 +1268,7 @@ data:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 40
+            "y": 33
           },
           "id": 51,
           "options": {
@@ -1481,7 +1291,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "airflow_dagrun_duration",
+              "expr": "airflow_dag_processing_last_duration{}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -1560,7 +1370,7 @@ data:
             "h": 7,
             "w": 24,
             "x": 0,
-            "y": 46
+            "y": 39
           },
           "id": 19,
           "options": {
@@ -1583,7 +1393,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "airflow_dagrun_dependency_check_injest_data",
+              "expr": "airflow_dagrun_dependency_check_injest_data{}",
               "interval": "",
               "legendFormat": "{{__name__}} p{{quantile}}",
               "range": true,
@@ -1618,7 +1428,7 @@ data:
         "list": []
       },
       "time": {
-        "from": "now-24h",
+        "from": "now-6h",
         "to": "now"
       },
       "timepicker": {
@@ -1636,8 +1446,8 @@ data:
         ]
       },
       "timezone": "",
-      "title": "Airflow cluster dashboard v1",
-      "uid": "lFXqBGxWd",
-      "version": 1,
+      "title": "Airflow cluster dashboard",
+      "uid": "lFXqBGxWf",
+      "version": 2,
       "weekStart": ""
     }
