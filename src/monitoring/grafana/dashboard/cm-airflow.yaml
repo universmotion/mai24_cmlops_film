@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-dashboard-model
+  name: grafana-dashboard-provider
   namespace: monitoring
   labels:
     grafana_dashboard: "1"
 data:
-  algorithme-recommandation-monitoring.json: |
+  provider-recommandation-monitoring.json: |
     {
       "annotations": {
         "list": [
