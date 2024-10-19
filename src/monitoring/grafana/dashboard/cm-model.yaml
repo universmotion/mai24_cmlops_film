@@ -127,8 +127,37 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT date_trunc('hour', mur.timestamp) as date_reco, \n       AVG(mur.rating * cast(mur.is_recommended as INTEGER)) AS \"Avg rating of movie recommended\",\n       AVG(mur.rating) AS \"Avg rating of movie not recommended\"\nFROM \"movies_users_rating\" mur\nWHERE  mur.rating IS NOT NULL\nand mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'\nGROUP BY 1\nORDER BY date_reco desc;",
+              "rawSql": "SELECT date_trunc('hour', mur.timestamp) as date_reco, \n       AVG(mur.rating * cast(mur.is_recommended as INTEGER)) AS \"Avg rating of movie recommended\",\n       AVG(mur.rating) AS \"Avg rating of movie\"\nFROM \"movies_users_rating\" mur\nWHERE  mur.rating IS NOT NULL\nand mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'\nGROUP BY 1\nORDER BY date_reco desc;",
               "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "P145019923814B48D"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "hide": false,
+              "rawQuery": true,
+              "rawSql": "SELECT date_trunc('hour', mur.timestamp) as date_reco, \n       AVG(mur.rating) AS \"Avg rating of movie not recommended\"\nFROM \"movies_users_rating\" mur\nWHERE  mur.rating IS NOT NULL\nand mur.is_recommended = False\nand mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}'\nGROUP BY 1\nORDER BY date_reco desc;",
+              "refId": "B",
               "sql": {
                 "columns": [
                   {
@@ -221,8 +250,37 @@ data:
               "editorMode": "code",
               "format": "table",
               "rawQuery": true,
-              "rawSql": "SELECT mur.rating AS rating_after_recommandation\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\n  and mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}';",
+              "rawSql": "SELECT mur.rating AS \"rating recommended\"\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = True\n  AND mur.rating IS NOT NULL\n  and mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}';",
               "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "P145019923814B48D"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "hide": false,
+              "rawQuery": true,
+              "rawSql": "SELECT mur.rating AS \"rating not recommended\"\nFROM \"movies_users_rating\" mur\nWHERE mur.is_recommended = False\n  AND mur.rating IS NOT NULL\n  and mur.timestamp between '${__from:date:YYYY-MM-DD HH:mm}'\n  and '${__to:date:YYYY-MM-DD HH:mm}';",
+              "refId": "B",
               "sql": {
                 "columns": [
                   {
